@@ -49,18 +49,7 @@ class Player {
 
 	public getScore = (): number => this.score;
 
-	public getScoreName = (): string => {
-		switch (this.score) {
-			case 0:
-				return EScoreName.love;
-			case 1:
-				return EScoreName.fifteen;
-			case 2:
-				return EScoreName.thirty;
-			case 3:
-				return EScoreName.forty;
-		}
-	};
+	public getScoreName = (): string => ScoreMap[this.score];
 
 	public getScoreNameForTie = (): string => (this.score < 3 ? `${this.getScoreName()}-All` : EScoreName.deuce);
 
@@ -76,3 +65,10 @@ enum EScoreName {
 	deuce = 'Deuce',
 	forty = 'Forty',
 }
+
+const ScoreMap = {
+	0: EScoreName.love,
+	1: EScoreName.fifteen,
+	2: EScoreName.thirty,
+	3: EScoreName.forty,
+};
