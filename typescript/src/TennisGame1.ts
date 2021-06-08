@@ -9,37 +9,29 @@ export class TennisGame1 implements TennisGame {
     this.player_2 = Player.factory({ name: player2Name });
   }
 
-  wonPoint(playerName: string): void {
+  public wonPoint(playerName: string): void {
     if (playerName === "player1") this.player_1.wonPoint();
     else this.player_2.wonPoint();
   }
 
-  getScore(): string {
+  public getScore(): string {
     let score: string = "";
     let tempScore: number = 0;
-    if (this.player_1.getScore() === this.player_2.getScore()) {
-      switch (this.player_1.getScore()) {
-        case 0:
-          score = "Love-All";
-          break;
-        case 1:
-          score = "Fifteen-All";
-          break;
-        case 2:
-          score = "Thirty-All";
-          break;
-        default:
-          score = "Deuce";
-          break;
-      }
-    } else if (this.player_1.getScore() >= 4 || this.player_2.getScore() >= 4) {
+    // Caso 1: parità tra due giocatori
+    if (this.arePlayerTied()) {
+      score = this.player_1.getScoreName();
+    }
+    // Caso 2: uno dei due giocatori ha superato i 4 punti
+    else if (this.player_1.getScore() >= 4 || this.player_2.getScore() >= 4) {
       const minusResult: number =
         this.player_1.getScore() - this.player_2.getScore();
       if (minusResult === 1) score = "Advantage player1";
       else if (minusResult === -1) score = "Advantage player2";
       else if (minusResult >= 2) score = "Win for player1";
       else score = "Win for player2";
-    } else {
+    }
+    // Caso 3: nessuno dei due giocatori è arrivato ancora ai 4 punti
+    else {
       for (let i = 1; i < 3; i++) {
         if (i === 1) tempScore = this.player_1.getScore();
         else {
@@ -64,6 +56,9 @@ export class TennisGame1 implements TennisGame {
     }
     return score;
   }
+
+  private arePlayerTied = (): boolean =>
+    this.player_1.getScore() === this.player_2.getScore();
 }
 
 class Player {
@@ -74,8 +69,27 @@ class Player {
 
   public getName = (): string => this.name;
   public getScore = (): number => this.score;
+  public getScoreName = (): string => {
+    switch (this.score) {
+      case 0:
+        return EScoreName.love_all;
+      case 1:
+        return EScoreName.fifteen_all;
+      case 2:
+        return EScoreName.thirty_all;
+      default:
+        return EScoreName.deuce;
+    }
+  };
 
   public wonPoint = (): void => {
     this.score += 1;
   };
+}
+
+enum EScoreName {
+  love_all = "Love-All",
+  fifteen_all = "Fifteen-All",
+  thirty_all = "Thirty-All",
+  deuce = "Deuce",
 }
