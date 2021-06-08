@@ -15,31 +15,38 @@ export class TennisGame1 implements TennisGame {
   }
 
   public getScore(): string {
-    // Caso 1: parità tra due giocatori
     if (this.arePlayerTied()) {
-      return this.player_1.getScoreNameTie();
+      return this.player_1.getScoreNameForTie();
     }
 
-    // Caso 2: uno dei due giocatori ha superato i 4 punti
-    else if (this.player_1.getScore() >= 4 || this.player_2.getScore() >= 4) {
+    if (this.areOnePlayerOver4Point()) {
       return this.getAdvantageScoreName();
     }
 
-    // Caso 3: nessuno dei due giocatori è arrivato ancora ai 4 punti
     return `${this.player_1.getScoreName()}-${this.player_2.getScoreName()}`;
   }
 
   private arePlayerTied = (): boolean =>
     this.player_1.getScore() === this.player_2.getScore();
 
+  private areOnePlayerOver4Point = (): boolean =>
+    this.player_1.getScore() >= 4 || this.player_2.getScore() >= 4;
+
   private getAdvantageScoreName = (): string => {
-    const score_diff: number =
-      this.player_1.getScore() - this.player_2.getScore();
-    if (score_diff === 1) return "Advantage player1";
-    else if (score_diff === -1) return "Advantage player2";
-    else if (score_diff >= 2) return "Win for player1";
-    else return "Win for player2";
+    const ahead_player = this.getAheadPlayer();
+
+    return this.getAbsScoreDiff() === 1
+      ? `Advantage ${ahead_player.getName()}`
+      : `Win for ${ahead_player.getName()}`;
   };
+
+  private getAbsScoreDiff = (): number =>
+    Math.abs(this.player_1.getScore() - this.player_2.getScore());
+
+  private getAheadPlayer = (): Player =>
+    this.player_1.getScore() > this.player_2.getScore()
+      ? this.player_1
+      : this.player_2;
 }
 
 class Player {
@@ -52,16 +59,16 @@ class Player {
 
   public getScore = (): number => this.score;
 
-  public getScoreNameTie = (): string => {
+  public getScoreNameForTie = (): string => {
     switch (this.score) {
       case 0:
-        return ETieScoreName.love_all;
+        return `${EScoreName.love}-All`;
       case 1:
-        return ETieScoreName.fifteen_all;
+        return `${EScoreName.fifteen}-All`;
       case 2:
-        return ETieScoreName.thirty_all;
+        return `${EScoreName.thirty}-All`;
       default:
-        return ETieScoreName.deuce;
+        return EScoreName.deuce;
     }
   };
 
@@ -89,11 +96,4 @@ enum EScoreName {
   thirty = "Thirty",
   deuce = "Deuce",
   forty = "Forty",
-}
-
-enum ETieScoreName {
-  love_all = "Love-All",
-  fifteen_all = "Fifteen-All",
-  thirty_all = "Thirty-All",
-  deuce = "Deuce",
 }
