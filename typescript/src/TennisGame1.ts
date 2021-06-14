@@ -1,5 +1,8 @@
 import { TennisGame } from './TennisGame';
 
+// ------------------------------------------------
+// TennisGame1 class
+// ------------------------------------------------
 export class TennisGame1 implements TennisGame {
 	private player_1: Player;
 	private player_2: Player;
@@ -9,22 +12,19 @@ export class TennisGame1 implements TennisGame {
 		this.player_2 = Player.factory({ name: player2Name });
 	}
 
-	public wonPoint(playerName: string): void {
-		if (playerName === 'player1') this.player_1.wonPoint();
-		else this.player_2.wonPoint();
-	}
+	public wonPoint = (playerName: string): void => {
+		if (playerName === this.player_1.getName()) this.player_1.wonPoint();
+		else if (playerName === this.player_2.getName()) this.player_2.wonPoint();
+		else throw 'Player not found';
+	};
 
-	public getScore(): string {
-		if (this.arePlayerTied()) {
-			return this.player_1.getScoreNameForTie();
-		}
+	public getScore = (): string => {
+		if (this.arePlayerTied()) return this.player_1.getScoreNameForTie();
 
-		if (this.areOnePlayerOver4Point()) {
-			return this.getAdvantageScoreName();
-		}
+		if (this.areOnePlayerOver4Point()) return this.getAdvantageScoreName();
 
 		return `${this.player_1.getScoreName()}-${this.player_2.getScoreName()}`;
-	}
+	};
 
 	private arePlayerTied = (): boolean => this.player_1.getScore() === this.player_2.getScore();
 
@@ -40,21 +40,24 @@ export class TennisGame1 implements TennisGame {
 	private getAheadPlayer = (): Player => (this.player_1.getScore() > this.player_2.getScore() ? this.player_1 : this.player_2);
 }
 
+// ------------------------------------------------
+// Player class
+// ------------------------------------------------
 class Player {
-	constructor(private name: string, private score = 0) {}
+	constructor(private _name: string, private _score = 0) {}
 
 	static factory = (data: { name: string; score?: number }) => new Player(data.name, data.score);
 
-	public getName = (): string => this.name;
+	public getName = (): string => this._name;
 
-	public getScore = (): number => this.score;
+	public getScore = (): number => this._score;
 
-	public getScoreName = (): string => ScoreMap[this.score];
+	public getScoreName = (): string => ScoreMap[this._score];
 
-	public getScoreNameForTie = (): string => (this.score < 3 ? `${this.getScoreName()}-All` : EScoreName.deuce);
+	public getScoreNameForTie = (): string => (this._score < 3 ? `${this.getScoreName()}-All` : EScoreName.deuce);
 
 	public wonPoint = (): void => {
-		this.score += 1;
+		this._score += 1;
 	};
 }
 
@@ -66,7 +69,7 @@ enum EScoreName {
 	forty = 'Forty',
 }
 
-const ScoreMap = {
+const ScoreMap: Record<number, EScoreName> = {
 	0: EScoreName.love,
 	1: EScoreName.fifteen,
 	2: EScoreName.thirty,
